@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 numpy = "*"
 pandas = "*"
+matplotlib = "*"
+scikit-learn = "*"
+tqdm = "*"
 
 [dev-packages]
 
