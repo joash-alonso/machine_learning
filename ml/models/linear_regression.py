@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Any, List
+from typing import Any, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -7,7 +7,7 @@ from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 from ..loss_functions.factory import LossFunctionFactory
-from .base import GradientModel, Optimiser
+from .base import EarlyStopping, GradientModel, Optimiser
 
 
 class LinearRegression(GradientModel):
@@ -19,23 +19,33 @@ class LinearRegression(GradientModel):
         n_iter: int,
         loss: str,
         optimiser: Optimiser,
+        early_stopping: EarlyStopping | None = None,
     ):
-        super().__init__(X=X, y=y)
-        self.loss = LossFunctionFactory.create_loss_function(loss)
+        super().__init__(
+            X=X,
+            y=y,
+        )
         self.learning_rate = learning_rate
         self.n_iter = n_iter
+        self.loss = LossFunctionFactory.create_loss_function(loss)
         self.optimiser = optimiser
+        self.early_stopping = early_stopping
         self.is_fitted = False
 
     def optimisation_loop(self, X: pd.DataFrame, y: pd.Series) -> None:
         for iteration in range(self.n_iter):
             y_pred = self.predict(X)
             dW, db, cost = self.loss(X, y, y_pred)
+            print(f"Cost: {cost}")
 
             self.weights -= self.learning_rate * dW
             self.bias -= self.learning_rate * db
 
             self.history[iteration] = cost
+
+            if self.early_stopping:
+                if self.early_stopping.check_stop_condition(loss=cost):
+                    break
 
     def fit(self) -> None:
         # Add a bias column to the input data
