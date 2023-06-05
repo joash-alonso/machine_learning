@@ -15,11 +15,8 @@ class Optimiser(Enum):
 
 
 class Model(ABC):
-    def __init__(self, X: pd.DataFrame, y: pd.Series):
-        self.X = X
-        self.y = y
+    def __init__(self):
         self.weights = None
-        self.bias = None
         self.history = {}
 
     @abstractmethod
@@ -37,20 +34,20 @@ class GradientModel(Model):
         X: pd.DataFrame,
         y: pd.Series,
     ):
-        super().__init__(X, y)
+        super().__init__()
+        self.X = X
+        self.y = y
 
-    def _mini_batch(
-        self, X: pd.DataFrame, y: pd.Series, batch_size: int
-    ) -> Tuple[np.array, np.array]:
+    def _mini_batch(self, batch_size: int) -> Tuple[np.array, np.array]:
         # Randomly shuffle the data
-        idx = np.random.permutation(X.shape[0])
-        X = X.iloc[idx]
-        y = y.iloc[idx]
+        idx = np.random.permutation(self.X.shape[0])
+        self.X = self.X.iloc[idx]
+        self.y = self.y.iloc[idx]
 
         # Split the data into batches
-        n_batches = X.shape[0] // batch_size
-        X_batches = np.array_split(X, n_batches)
-        y_batches = np.array_split(y, n_batches)
+        n_batches = self.X.shape[0] // batch_size
+        X_batches = np.array_split(self.X, n_batches)
+        y_batches = np.array_split(self.y, n_batches)
 
         return X_batches, y_batches
 
@@ -58,7 +55,7 @@ class GradientModel(Model):
         return self._mini_batch(X, y, 1)
 
     @abstractmethod
-    def optimisation_loop(self, X: pd.DataFrame, y: pd.Series) -> None:
+    def optimisation_loop(self) -> None:
         pass
 
 
