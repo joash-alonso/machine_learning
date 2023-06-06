@@ -1,6 +1,4 @@
-import numpy as np
-
-from .base import LossFunction
+from .loss_function import LossFunction
 
 # class SoftmaxCrossEntropy(LossFunction):
 #     """Calculates the softmax cross entropy between the true and predicted values.

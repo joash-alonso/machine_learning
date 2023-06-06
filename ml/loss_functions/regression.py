@@ -2,7 +2,7 @@ from typing import Tuple
 
 import numpy as np
 
-from .base import LossFunction
+from .loss_function import LossFunction
 
 
 class MeanSquaredError(LossFunction):
